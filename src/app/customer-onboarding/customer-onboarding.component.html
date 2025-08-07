@@ -1,0 +1,152 @@
+<div class="onboarding-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Customer Onboarding</h2>
+      <p class="subtitle">Fill out the form below to onboard a new customer.</p>
+    </div>
+
+    <!-- Moved CSV upload section to the top -->
+    <div class="csv-upload-section">
+      <label for="csvUpload" class="csv-upload-label">
+        <div class="csv-upload-zone">
+          <span>Upload a CSV file to pre-fill the form</span>
+        </div>
+        <input id="csvUpload" type="file" accept=".csv" (change)="onCsvUpload($event)">
+      </label>
+    </div>
+
+    <form [formGroup]="onboardingForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group-section">
+        <h3>Customer Information</h3>
+        <div formGroupName="customer">
+          <div class="input-group">
+            <div class="input-field">
+              <label for="name">Full Name <span class="required-symbol">*</span></label>
+              <input id="name" type="text" formControlName="name" placeholder="John Doe">
+              <div *ngIf="onboardingForm.get('customer.name')?.invalid && onboardingForm.get('customer.name')?.touched" class="error-message">Name is required.</div>
+            </div>
+            <div class="input-field">
+              <label for="email">Email Address <span class="required-symbol">*</span></label>
+              <input id="email" type="email" formControlName="email" placeholder="john.doe@example.com">
+              <div *ngIf="onboardingForm.get('customer.email')?.invalid && onboardingForm.get('customer.email')?.touched" class="error-message">Valid email is required.</div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="input-field">
+              <label for="phone">Phone Number <span class="required-symbol">*</span></label>
+              <input id="phone" type="tel" formControlName="phone" placeholder="+1234567890">
+              <div *ngIf="onboardingForm.get('customer.phone')?.invalid && onboardingForm.get('customer.phone')?.touched" class="error-message">Phone number is required.</div>
+            </div>
+            <div class="input-field">
+              <label for="dob">Date of Birth <span class="required-symbol">*</span></label>
+              <input id="dob" type="date" formControlName="date_of_birth">
+              <div *ngIf="onboardingForm.get('customer.date_of_birth')?.invalid && onboardingForm.get('customer.date_of_birth')?.touched" class="error-message">Date of Birth is required.</div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="input-field">
+              <label for="nationality">Nationality <span class="required-symbol">*</span></label>
+              <input id="nationality" type="text" formControlName="nationality" placeholder="US">
+              <div *ngIf="onboardingForm.get('customer.nationality')?.invalid && onboardingForm.get('customer.nationality')?.touched" class="error-message">Nationality is required.</div>
+            </div>
+            <div class="input-field">
+              <label for="customer_type">Customer Type <span class="required-symbol">*</span></label>
+              <select id="customer_type" formControlName="customer_type">
+                <option *ngFor="let type of customerTypeOptions" [value]="type">{{ type | titlecase }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group-section">
+        <h3>Address <span class="required-symbol">*</span></h3>
+        <div formGroupName="customer">
+          <div formGroupName="address">
+            <div class="input-group">
+              <div class="input-field">
+                <label for="address_line1">Address Line 1 <span class="required-symbol">*</span></label>
+                <input id="address_line1" type="text" formControlName="line1" placeholder="123 Main Street">
+              </div>
+              <div class="input-field">
+                <label for="address_city">City <span class="required-symbol">*</span></label>
+                <input id="address_city" type="text" formControlName="city" placeholder="New York">
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-field">
+                <label for="address_state">State <span class="required-symbol">*</span></label>
+                <input id="address_state" type="text" formControlName="state" placeholder="NY">
+              </div>
+              <div class="input-field">
+                <label for="address_zip">ZIP Code <span class="required-symbol">*</span></label>
+                <input id="address_zip" type="text" formControlName="zip" placeholder="10001">
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-field full-width">
+                <label for="address_country">Country <span class="required-symbol">*</span></label>
+                <input id="address_country" type="text" formControlName="country" placeholder="USA">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group-section">
+        <h3>Additional Details</h3>
+        <div class="input-group">
+          <div class="input-field">
+            <label for="priority">Priority <span class="required-symbol">*</span></label>
+            <select id="priority" formControlName="priority">
+              <option *ngFor="let option of priorityOptions" [value]="option">{{ option | titlecase }}</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label>Tags</label>
+            <div class="tags-input-container">
+              <input type="text" placeholder="Add a tag" [(ngModel)]="tagInput" [ngModelOptions]="{standalone: true}" (keyup.enter)="addTag()">
+              <button type="button" class="add-tag-button" (click)="addTag()">Add Tag</button>
+            </div>
+            <div class="tags-display">
+              <span *ngFor="let tag of tags.controls; let i = index" class="tag-pill">
+                {{ tag.value }}
+                <span class="remove-tag" (click)="removeTag(i)">&times;</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group-section">
+        <h3>Documents</h3>
+
+
+        <label for="fileUpload" class="file-upload-label">
+          <div class="file-upload-zone">
+            <span>Click or drag files here to upload (max 15MB each)</span>
+          </div>
+          <input id="fileUpload" type="file" multiple (change)="onFileChange($event)">
+        </label>
+
+        <div *ngIf="selectedFiles.length > 0" class="file-list">
+          <div *ngFor="let file of selectedFiles; let i = index" class="file-item">
+            <span class="file-name">{{ file.name }}</span>
+            <button type="button" class="remove-file" (click)="removeFile(i)">&times;</button>
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+        <button type="submit" class="submit-button" [disabled]="onboardingForm.invalid || isLoading">
+          <span *ngIf="!isLoading">Submit Onboarding Request</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
